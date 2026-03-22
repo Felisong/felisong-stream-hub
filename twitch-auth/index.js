@@ -4,6 +4,8 @@ const express = require('express');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const WebSocket = require('ws');
+const { subscribe } = require('diagnostics_channel');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -76,7 +78,64 @@ async function refreshAccessToken(){
 
   } catch (err) {
     console.error('Failed to refresh token:', err)
-  }}
+}}
+
+// WEB SOCKET FOR EVENT SUB
+async function connectEventSub() {
+  const tokens = JSON.parse(fs.readFileSync(path.join(__dirname, 'tokens.json')))
+  const ws = new WebSocket('wss://eventsub.wss.twitch.tv/ws')
+
+  ws.on('open', () => {
+    console.log('Connected to Twitch EventSub!')
+  })
+
+  ws.on('message', async (data) => {
+    const msg = JSON.parse(data)
+    const type = msg.metadata?.message_type
+
+    if (type === 'session_welcome') {
+      const sessionId = msg.payload.session.id
+      console.log('Session ID:', sessionId)
+      await subscribeToEvents(sessionId, tokens.access_token)
+    }
+
+    if (type === 'notification') {
+      const event = msg.payload.event
+      const rewardTitle = msg.payload.subscription.type
+      console.log('Event received:', rewardTitle, event)
+    }
+  })
+
+  ws.on('close', () => {
+    console.log('EventSub disconnected, reconnecting in 5s...')
+    setTimeout(connectEventSub, 5000)
+  })
+}
+
+async function subscribeToEvents(sessionId, accessToken) {
+  const broadcasterId = process.env.TWITCH_BROADCASTER_ID
+
+  await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
+    type: 'channel.channel_points_custom_reward_redemption.add',
+    version: '1',
+    condition: { broadcaster_user_id: broadcasterId },
+    transport: {
+      method: 'websocket',
+      session_id: sessionId
+    }
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Client-Id': process.env.TWITCH_CLIENT_ID,
+      'Content-Type': 'application/json'
+    }
+  })
+
+  console.log('Subscribed to channel point redemptions!')
+}
+
+connectEventSub()
+
 
 // listener
 app.listen(PORT, () => {
