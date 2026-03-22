@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            const eventSource = new EventSource('http://localhost:3000/projects/cat-spawner/events');
+            
+            eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+            };
+
+            eventSource.onerror = () => {
+                console.log(`SSE connection was lost, browser will reconnect...`);
+            }
+        </script>
+        <title>Cat Spawner</title>
+        <!-- import css/ js here -->
+    </head>
+    <body>
+        <header><h1>Hello!</h1></header>
+        <p>meow</p>
+    </body>
+</html>

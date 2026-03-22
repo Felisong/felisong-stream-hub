@@ -5,7 +5,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
-const { subscribe } = require('diagnostics_channel');
+const {router, broadcastToCatSpawner} = require('./routes/projects');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -21,7 +21,9 @@ const SCOPES = [
   'channel:manage:raids'
 ].join(' ')
 
-console.log(`MyelllO!: `, process.env.TWITCH_REDIRECT_URI);
+app.use('/projects', router);
+app.use('/cat-spawner', express.static(path.join(__dirname, '../assets/cat-spawner')))
+
 // redirect to twitch login
 app.get('/auth', (req, res) => {
     const url =  `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
@@ -103,6 +105,8 @@ async function connectEventSub() {
       const event = msg.payload.event
       const rewardTitle = msg.payload.subscription.type
       console.log('Event received:', rewardTitle, event)
+
+      broadcastToCatSpawner({reward: event.reward, user: event.user_name, input: event.input});
     }
   })
 
