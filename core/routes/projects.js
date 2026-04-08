@@ -17,20 +17,32 @@ router.get('/cat-spawner/events', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
+    res.write('data: {"connected": true}\n\n'); 
     
     clients.catSpawner.push(res);
-    console.log(`Cat spawn client connectedion, totalL ${clients.catSpawner.length}`);
+    console.log(`Cat spawn client connectedion, total:${clients.catSpawner.length}`);
+  
+        // keep connection alive
+    const heartbeat = setInterval(() => {
+        res.write(': ping\n\n');
+    }, 15000);
 
     // clear array on close.
     req.on('close', () => {
+        clearInterval(heartbeat);
+        console.log('Client disconnected!'); 
         clients.catSpawner = clients.catSpawner.filter(c => c !== res);
+        console.log(`Remaining clients: ${clients.catSpawner.length}`); 
+   
     })
 })
 
 // now on updates, update the data in each object coming in
 function broadcastToCatSpawner(event){
-    const data = `data ${JSON.stringify(event)}\n\n`
+    console.log(`broadcasting to ${clients.catSpawner.length} clients`)
+    const data = `data: ${JSON.stringify(event)}\n\n`
     clients.catSpawner.forEach(client => client.write(data));
 }
 

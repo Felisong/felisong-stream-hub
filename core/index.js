@@ -24,8 +24,12 @@ const SCOPES = [
 app.use('/projects', router);
 app.use('/cat-spawner', express.static(path.join(__dirname, '../assets/cat-spawner')))
 
+app.get('/', (req, res) => {
+  res.send.JSON({status: 'healthy', informationNeeded: {unknown: "no notes!"}});
+})
 // redirect to twitch login
 app.get('/auth', (req, res) => {
+   console.log(`test i should make it here`, process.env.TWITCH_CLIENT_ID);
     const url =  `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
     res.redirect(url);
 })
@@ -33,6 +37,7 @@ app.get('/auth', (req, res) => {
 // twitch sends us back here with a code
 app.get('/auth/callback', async (req, res) => {
     const code = req.query.code;
+   
 
     try {
         const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
@@ -47,9 +52,9 @@ app.get('/auth/callback', async (req, res) => {
 
         const tokens = response.data;
         console.log(`tokens: `, JSON.stringify(tokens, null, 2));
-        fs.writeFileSync('./tokens.json', JSON.stringify(tokens, null, 2));
         fs.writeFileSync(path.join(__dirname, 'tokens.json'), JSON.stringify(tokens, null, 2));        
         console.log('Tokens saved!')
+        res.send('Auth complete! You can close this tab.');
 
     } catch (err){
         console.error(err);
@@ -106,7 +111,7 @@ async function connectEventSub() {
       const rewardTitle = msg.payload.subscription.type
       console.log('Event received:', rewardTitle, event)
 
-      broadcastToCatSpawner({reward: event.reward, user: event.user_name, input: event.input});
+      broadcastToCatSpawner({reward: event.reward, user: event.user_name, input: event.user_input});
     }
   })
 
