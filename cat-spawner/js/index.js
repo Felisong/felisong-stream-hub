@@ -1,5 +1,9 @@
-"Use Strict"
-function environmentLoop(){
+"use strict";
+function environmentLoop() {
+  const height = window.innerHeight;
+  const width = window.innerWidth;
 
+  console.log(`test: `, height, width);
 }
-   console.log(`my own shows up right?`)
+environmentLoop();
+window.addEventListener("resize", environmentLoop);

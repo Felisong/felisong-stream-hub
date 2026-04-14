@@ -11,7 +11,7 @@ const axios = require("axios");
 const {broadcastToCatSpawner} = require("./routes/projects");
 
 async function refreshAccessToken() {
-  const tokens = json.parse(
+  const tokens = JSON.parse(
     fs.readFileSync(path.join(__dirname, "tokens.json")),
   );
 

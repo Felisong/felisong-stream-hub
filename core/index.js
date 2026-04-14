@@ -27,7 +27,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send.JSON({
+  res.json({
     status: "healthy",
     informationNeeded: { unknown: "no notes!" },
   });
