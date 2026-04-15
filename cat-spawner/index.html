@@ -1,20 +1,8 @@
 <!doctype html>
 <html>
   <head>
-    <script src="../cat-spawner/js/index.js" defer></script>
-    <script>
-      const eventSource = new EventSource(
-        "http://localhost:3000/projects/cat-spawner/events",
-      );
+    <script src="./js/index.js" defer></script>
 
-      let latestReward = {};
-      eventSource.onmessage = (e) => {
-        const currentEvent = JSON.parse(e.data);
-      };
-      eventSource.onerror = (e) => {
-        console.log(`error! ${JSON.stringify(e)}`);
-      };
-    </script>
 
     <title>Cat Spawner</title>
     <!-- import css/ js here -->
@@ -22,6 +10,7 @@
   <body>
     <header><h1>Hello!</h1></header>
     <p>meow</p>
+    <p id="info"></p>
     <p>test 123 :3</p>
     <p>does this update??</p>
   </body>
