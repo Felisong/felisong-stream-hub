@@ -4,18 +4,25 @@ If it doesnt even exist -> visit auth url -> authorize -> write the file -> set 
 if it does exist and its EXPIRED -> refresh token timeout -> subscribe to events
 if it does exis tand works -> subscribe to events and sets token timeout.
  */
+
+// invalid auth token
+// i guess im sending the file to authorize and it crashes when its not
+// add try loop to catch the crash, and delete the file, then rerun start up process?
 const fs = require("fs");
 const WebSocket = require("ws");
 const path = require("path");
 const axios = require("axios");
-const {broadcastToCatSpawner} = require("./routes/projects");
+const { broadcastToCatSpawner } = require("./routes/projects");
+const { fileURLToPath } = require("url");
 
 async function refreshAccessToken() {
+  // in refresh access token, get the current token.
   const tokens = JSON.parse(
     fs.readFileSync(path.join(__dirname, "tokens.json")),
   );
 
   try {
+    // ask for a refresh token
     const response = await axios.post(
       "https://id.twitch.tv/oauth2/token",
       null,
@@ -29,15 +36,18 @@ async function refreshAccessToken() {
       },
     );
 
+    // read the new tokens, and write in the file to update!
     const newTokens = response.data;
+    newTokens.expires_at = Date.now() + tokens.expires_in * 1000;
     fs.writeFileSync(
       path.join(__dirname, "tokens.json"),
       JSON.stringify(newTokens, null, 2),
     );
+    // the token... should be refreshed...
     console.log("Tokens refreshed!");
     return newTokens.access_token;
   } catch (err) {
-    console.error("Failed to refresh token:", err);
+    // console.error("Failed to refresh token:", err);
   }
 }
 
@@ -49,6 +59,7 @@ function connectToMyEventSub() {
     const tokens = JSON.parse(
       fs.readFileSync(path.join(__dirname, "tokens.json")),
     );
+
     const ws = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
 
     ws.on("open", () => {
@@ -61,14 +72,14 @@ function connectToMyEventSub() {
 
       if (type === "session_welcome") {
         const sessionId = msg.payload.session.id;
-        console.log("Session ID:", sessionId);
+        // console.log("Session ID:", sessionId);
         await subscribeToEvents(sessionId, tokens.access_token);
       }
 
       if (type === "notification") {
         const event = msg.payload.event;
         const rewardTitle = msg.payload.subscription.type;
-        console.log("Event received:", rewardTitle, event);
+        // console.log("Event received:", rewardTitle, event);
 
         broadcastToCatSpawner({
           reward: event.reward,
@@ -114,15 +125,37 @@ function connectToMyEventSub() {
 }
 
 async function startUp() {
+  // if the file exists =>
   if (fs.existsSync(path.join(__dirname, "tokens.json"))) {
+    // read the contents
     const tokens = JSON.parse(
       fs.readFileSync(path.join(__dirname, "tokens.json")),
     );
-    if (tokens.expires_at && Date.now() > tokens.expires_at) await refreshAccessToken();
+    fs.writeFileSync(
+      "debug.log",
+      `[${Date.now()}] I make it to read the file.\n`,
+      {
+        flag: "a",
+      },
+    );
+
+    if (tokens.expires_at && Date.now() > tokens.expires_at) {
+      fs.writeFileSync(
+        "debug.log",
+        `[${Date.now()}] expires_at is real, and date.now\n`,
+        {
+          flag: "a",
+        },
+      );
+
+      await refreshAccessToken();
+    }
+
     connectToMyEventSub();
     setInterval(refreshAccessToken, 1000 * 60 * 60);
+    // i never delete the file here.
   } else {
-    console.log(`Please visit http://localhost:3000/auth`)
+    console.log(`Please visit http://localhost:3000/auth`);
   }
 }
 

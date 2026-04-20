@@ -26,7 +26,7 @@ eventSource.onmessage = (e) => {
   // info.innerHTML = String(activeCats.get(currentEvent.username));
 };
 eventSource.onerror = (e) => {
-  console.log(`error! ${JSON.stringify(e)}`);
+  // console.log(`error! ${JSON.stringify(e)}`);
 };
 
 // environment loop
