@@ -1,5 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+/*
+Source - https://stackoverflow.com/a/62505416
+Posted by Hans Spieß
+Retrieved 2026-07-01, License - CC BY-SA 4.0
+*/
+
+html,
+body {
+   margin: 0;
+   padding: 0;
+}
+
 #cat-play-area {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   position: relative;
 }
