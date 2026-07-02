@@ -1,5 +1,6 @@
 "use strict";
 import { spawnCat } from "./catHelpers.js";
+import { Cats } from "./catClass.js";
 const eventSource = new EventSource(
   "http://localhost:3000/projects/cat-spawner/events",
 );
@@ -61,10 +62,24 @@ function gameLoop(timestamp) {
   const dt = timestamp - lastTime;
   lastTime = timestamp;
   // function update here
+  updateCats();
 
   // function render here
 
   requestAnimationFrame(gameLoop);
+}
+
+function updateCats() {
+  // this will update all the cat's co-ordinates
+
+  activeCats.forEach((c) => {
+    const cat = new Cats(c);
+
+    cat.defaultStateManager();
+
+    // update x co-ordinates values on object
+    // update y co-ordinates values on object
+  });
 }
 
 // window tracker
@@ -72,7 +87,6 @@ function windowTracker() {
   windowWidth = window.innerWidth;
   windowHeight = window.innerHeight;
 }
-
 
 requestAnimationFrame(gameLoop);
 windowTracker();
