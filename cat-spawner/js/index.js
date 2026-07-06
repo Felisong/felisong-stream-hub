@@ -19,11 +19,10 @@ eventSource.onmessage = (e) => {
   // whenever there IS an event it will be redeemed by one person...
   const currentCat = activeCats.get(`${currentEvent.user}`);
 
-
   // y axis starts 5-100
   // x axis is 0-95
   if (!currentCat) {
-     // if this is a new cat.  Creates the cat!
+    // if this is a new cat.  Creates the cat!
     const cat = new Cats({
       name: currentEvent.user,
       color: currentEvent.input || "white",
@@ -32,12 +31,13 @@ eventSource.onmessage = (e) => {
       scale: 1,
       state: "spawn",
       opacity: 100,
+      velocity: {x: 1, y: 0}
     });
     cat.spawnCat(windowHeight, windowWidth);
     activeCats.set(`${currentEvent.user}`, cat);
     return;
-  } 
-  // cat exists. 
+  }
+  // cat exists.
 
   // read the event (melee mode, eat, lick etc*)
   // depending on name provide one variable that new stat
@@ -54,8 +54,8 @@ eventSource.onerror = (e) => {
 function gameLoop(timestamp) {
   if (lastTime === undefined) lastTime = timestamp;
 
-  // delta time
-  const dt = timestamp - lastTime;
+  // delta time in seconds
+  const dt = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
   // function update here
   updateCats(dt);
@@ -65,19 +65,18 @@ function gameLoop(timestamp) {
   requestAnimationFrame(gameLoop);
 }
 
-function updateCats( dt) {
+function updateCats(dt) {
   // this will update all the cat's bdefault behaviors
   activeCats.forEach((c) => {
-    c.defaultStateManager( dt);
+    c.defaultStateManager(dt, windowHeight, windowWidth);
   });
 }
 
-function renderCats( dt) {
+function renderCats(dt) {
   activeCats.forEach((c) => {
     c.render(windowHeight, windowWidth, dt);
-  })
+  });
 }
-
 
 // window tracker
 function windowTracker() {

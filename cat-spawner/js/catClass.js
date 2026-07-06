@@ -7,6 +7,8 @@ export class Cats {
     this.scale = cat.scale;
     this.state = cat.state;
     this.opacity = cat.opacity;
+    this.direction = cat.direction;
+    this.velocity = cat.velocity;
     // cat render properties
     this.container = null;
     this.body = null;
@@ -39,10 +41,19 @@ export class Cats {
     this.render(windowHeight, windowWidth);
   }
 
-  defaultStateManager(dt) {
-    // so i got the info outside from the specific cat.
-    // console.log(`hello! Test! I am being read`, this.cat)
-    // switch case here to tell which state behavior it should be according to this.state;
+  defaultStateManager(dt, windowHeight, windowWidth) {
+    switch (this.state) {
+      case "spawn":
+        this.state = "walk";
+        this.walk(dt);
+        break;
+      case "walk":
+        this.walk(dt);
+        break;
+      default:
+        break;
+    }
+    this.render(windowHeight, windowWidth);
   }
 
   render(windowHeight, windowWidth, dt) {
@@ -56,6 +67,14 @@ export class Cats {
     this.container.style.transform = `translate(${translateX}px, ${translateY}px)`;
     this.container.style.opacity = `${this.opacity}%`;
     this.body.style.backgroundColor = `${this.color}`;
+  }
 
+  // TODO: so things are good but figure out how this velocity works best. I really want this to work well. and scale well. I left everythign rendering correctly so its figuring out states currently.
+  // STATE HANDLERS
+  walk(dt) {
+    this.velocity = {
+      x: 1,
+      y: 0,
+    };
   }
 }
