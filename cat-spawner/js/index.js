@@ -1,5 +1,4 @@
 "use strict";
-import { spawnCat } from "./catHelpers.js";
 import { Cats } from "./catClass.js";
 const eventSource = new EventSource(
   "http://localhost:3000/projects/cat-spawner/events",
@@ -14,18 +13,18 @@ let lastTime;
 // reads current events this will be how things will change
 eventSource.onmessage = (e) => {
   const currentEvent = JSON.parse(e.data);
-  console.log(typeof currentEvent, currentEvent);
-  // add a blocker so that it only does this is the event is what i want it to be
+  console.log(`Event used`, currentEvent);
+  // add a blocker so that it only does this if the event isn't a connection one.
   if (currentEvent.connected) return;
-  //   if (currentEvent.event.id !== '') return;
-  // find the event name to do an if else statement. maybe a
-  // const newState = currentEvent.event.name or something
+  // whenever there IS an event it will be redeemed by one person...
+  const currentCat = activeCats.get(`${currentEvent.user}`);
+
 
   // y axis starts 5-100
   // x axis is 0-95
-  if (!activeCats.get(`${currentEvent.user}`)) {
-    // if this is a new cat.  Creates the cat!
-    activeCats.set(`${currentEvent.user}`, {
+  if (!currentCat) {
+     // if this is a new cat.  Creates the cat!
+    const cat = new Cats({
       name: currentEvent.user,
       color: currentEvent.input || "white",
       xPos: 0,
@@ -34,20 +33,17 @@ eventSource.onmessage = (e) => {
       state: "spawn",
       opacity: 100,
     });
-  } else {
-    // this is how I can update state later too.
+    cat.spawnCat(windowHeight, windowWidth);
+    activeCats.set(`${currentEvent.user}`, cat);
+    return;
+  } 
+  // cat exists. 
 
-    // state will have to come if a reward came in, we'll have an if else statement or switch statement above to sort which one it is
-    activeCats.set(`${currentEvent.user}`, {
-      ...activeCats.get(`${currentEvent.user}`), // keep existing fields
-      color: currentEvent.input || "white", // overwrite only these
-      opacity: 100,
-      // state: value from message
-    });
-  }
-  // create new cat
-  // this function will be moved to inside the new cat later.
-  spawnCat(activeCats.get(`${currentEvent.user}`), windowHeight, windowWidth);
+  // read the event (melee mode, eat, lick etc*)
+  // depending on name provide one variable that new stat
+  // const newState = currentEvent value I read.
+
+  // currentCat.state = newState; ?
 };
 
 eventSource.onerror = (e) => {
@@ -62,25 +58,26 @@ function gameLoop(timestamp) {
   const dt = timestamp - lastTime;
   lastTime = timestamp;
   // function update here
-  updateCats();
-
+  updateCats(dt);
   // function render here
+  renderCats(dt);
 
   requestAnimationFrame(gameLoop);
 }
 
-function updateCats() {
-  // this will update all the cat's co-ordinates
-
+function updateCats( dt) {
+  // this will update all the cat's bdefault behaviors
   activeCats.forEach((c) => {
-    const cat = new Cats(c);
-
-    cat.defaultStateManager();
-
-    // update x co-ordinates values on object
-    // update y co-ordinates values on object
+    c.defaultStateManager( dt);
   });
 }
+
+function renderCats( dt) {
+  activeCats.forEach((c) => {
+    c.render(windowHeight, windowWidth, dt);
+  })
+}
+
 
 // window tracker
 function windowTracker() {
