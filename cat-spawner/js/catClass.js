@@ -1,3 +1,16 @@
+  
+  
+  const stateConfig = {
+    walk: {
+      speed: 2,
+      minDuration: 2,
+      maxDuration: 20,
+      hitbox: {h: 100, h: 100},
+      spriteFolder: 'walk'
+    },
+    // put all state configs in here
+  }
+
 export class Cats {
   constructor(cat) {
     this.name = cat.name;
@@ -14,6 +27,7 @@ export class Cats {
     this.body = null;
     this.nameLabel = null;
   }
+
 
   spawnCat(windowHeight, windowWidth) {
     const playArea = window.document.getElementById("cat-play-area");
@@ -53,7 +67,6 @@ export class Cats {
       default:
         break;
     }
-    this.render(windowHeight, windowWidth);
   }
 
   render(windowHeight, windowWidth, dt) {
@@ -69,12 +82,19 @@ export class Cats {
     this.body.style.backgroundColor = `${this.color}`;
   }
 
-  // TODO: so things are good but figure out how this velocity works best. I really want this to work well. and scale well. I left everythign rendering correctly so its figuring out states currently.
   // STATE HANDLERS
   walk(dt) {
+    const config = stateConfig('walk');
+    // speed comes from the config (moves 2 unites forward), we get velocity here by * the speed (2 * 1). 1 is right -1 is left.
     this.velocity = {
-      x: 1,
-      y: 0,
-    };
+      x: config.speed * this.direction,
+      y: 0
+    }
+  }
+
+  newPosition(dt){
+    // so velocity is figured out in state, then position is picked after.
+    this.xPos += this.velocity * dt;
+    this.yPos += this.velocity * dt;
   }
 }

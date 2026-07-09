@@ -31,7 +31,8 @@ eventSource.onmessage = (e) => {
       scale: 1,
       state: "spawn",
       opacity: 100,
-      velocity: {x: 1, y: 0}
+      direction: 1,
+      velocity: {x: 0, y: 0}
     });
     cat.spawnCat(windowHeight, windowWidth);
     activeCats.set(`${currentEvent.user}`, cat);
