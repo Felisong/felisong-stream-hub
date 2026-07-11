@@ -32,7 +32,8 @@ eventSource.onmessage = (e) => {
       state: "spawn",
       opacity: 100,
       direction: 1,
-      velocity: {x: 0, y: 0}
+      velocity: { x: 0, y: 0 },
+      duration: 0,
     });
     cat.spawnCat(windowHeight, windowWidth);
     activeCats.set(`${currentEvent.user}`, cat);
@@ -51,6 +52,7 @@ eventSource.onerror = (e) => {
   console.log(`error on event!: `, e);
 };
 
+let run = 0;
 // environmentLoop
 function gameLoop(timestamp) {
   if (lastTime === undefined) lastTime = timestamp;
@@ -59,22 +61,27 @@ function gameLoop(timestamp) {
   const dt = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
   // function update here
-  updateCats(dt);
-  // function render here
-  renderCats(dt);
+  handleCatBehavior(dt);
 
+  // if (run > 250) {
+  //   console.log("NO MORE");
+  //   return;
+  // } else {
   requestAnimationFrame(gameLoop);
+  // }
 }
 
-function updateCats(dt) {
-  // this will update all the cat's bdefault behaviors
+function handleCatBehavior(dt) {
   activeCats.forEach((c) => {
+    // how long has the cat been in current state?
+    c.stateDuration(dt);
+    // INTENTION OF THE CAT
     c.defaultStateManager(dt, windowHeight, windowWidth);
-  });
-}
-
-function renderCats(dt) {
-  activeCats.forEach((c) => {
+    // move cat values where they are intended
+    c.newPosition(dt);
+    // check if cat has reached a limit
+    c.borderHandler();
+    // render cat
     c.render(windowHeight, windowWidth, dt);
   });
 }
