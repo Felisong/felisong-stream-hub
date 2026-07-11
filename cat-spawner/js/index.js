@@ -8,6 +8,7 @@ let latestReward = {};
 let windowWidth = 0;
 let windowHeight = 0;
 let lastTime;
+let isSpecialState = false;
 // i can make an array of colors it default can have and math.random one from it
 
 // reads current events this will be how things will change
@@ -34,6 +35,7 @@ eventSource.onmessage = (e) => {
       direction: 1,
       velocity: { x: 0, y: 0 },
       duration: 0,
+      targetDuration: 0
     });
     cat.spawnCat(windowHeight, windowWidth);
     activeCats.set(`${currentEvent.user}`, cat);
@@ -72,6 +74,7 @@ function gameLoop(timestamp) {
 }
 
 function handleCatBehavior(dt) {
+  // 1 cat spawns..
   activeCats.forEach((c) => {
     // how long has the cat been in current state?
     c.stateDuration(dt);

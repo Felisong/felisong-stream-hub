@@ -14,15 +14,15 @@ const stateConfig = {
     id: 1,
     speed: 5,
     minDuration: 2,
-    maxDuration: 20,
+    maxDuration: 7,
     hitbox: { h: 100, w: 100 },
     spriteFolder: "walk",
   },
   run: {
     id: 2,
     speed: 15,
-    minDuration: 3,
-    maxDuration: 9,
+    minDuration: 2,
+    maxDuration: 5,
     hitbox: { h: 100, w: 100 },
     spriteFolder: "run",
   },
@@ -34,7 +34,30 @@ const stateConfig = {
     hitbox: { h: 100, w: 100 },
     spriteFolder: "jump",
   },
-  // put all state configs in here
+  lay: {
+    id: 4,
+    speed: 0,
+    minDuration: 5,
+    maxDuration: 10,
+    hitbox: { h: 100, w: 100 },
+    spriteFolder: "lay",
+  },
+  sit: {
+    id: 5,
+    speed: 0,
+    minDuration: 3,
+    maxDuration: 10,
+    hitbox: { h: 100, w: 100 },
+    spriteFolder: "sit",
+  },
+  stand: {
+    id: 4,
+    speed: 0,
+    minDuration: 4,
+    maxDuration: 7,
+    hitbox: { h: 100, w: 100 },
+    spriteFolder: "stand",
+  },
 };
 
 export class Cats {
@@ -50,6 +73,7 @@ export class Cats {
     this.velocity = cat.velocity;
     // state duration
     this.duration = cat.duration;
+    this.targetDuration = cat.targetDuration;
     // cat render properties
     this.container = null;
     this.body = null;
@@ -82,50 +106,58 @@ export class Cats {
     this.render(windowHeight, windowWidth);
   }
 
+  enterState(newState) {
+    this.state = newState;
+    this.duration = 0;
+    const cfg = stateConfig[newState];
+    this.targetDuration =
+      Math.random() * (cfg.maxDuration - cfg.minDuration) + cfg.minDuration;
+    console.log(`new state selected! :`, newState, "successfully triggered.");
+  }
+
   stateDuration(dt) {
     if (this.state === "spawn") return;
 
-    const currentState = stateConfig[this.state];
     this.duration += dt;
-    if (
-      this.duration >
-      Math.random() * (currentState.maxDuration - currentState.minDuration) +
-        currentState.minDuration
-    ) {
-      // if the duration so far is longer than the first instance of the random seconds passed from min max...\
-
-      // Source - https://stackoverflow.com/a/16976940
-      // Posted by Barmar, modified by community. See post 'Timeline' for change history
-      // Retrieved 2026-07-10, License - CC BY-SA 3.0
-      // chosen id equals a random # from 1 & the length of the obect entries (3)
-      let chosenId =
-        Math.floor(Math.random() * Object.keys(stateConfig).length) + 1;
-      const states = Object.entries(stateConfig).forEach(([key, val]) => {
-        if (val.id === chosenId) {
-          this.state = key;
-        }
-      });
+    if (this.duration > this.targetDuration) {
+      const otherStates = Object.entries(stateConfig).filter(
+        ([key]) => key !== this.state,
+      );
+      const [chosenKey] =
+        otherStates[Math.floor(Math.random() * otherStates.length)];
+      this.enterState(chosenKey);
     }
-    // else state stays the same
   }
 
   defaultStateManager(dt, windowHeight, windowWidth) {
     switch (this.state) {
       case "spawn":
-        this.state = "walk";
-        this.walk(dt);
+        this.enterState("walk");
         break;
       case "walk":
         this.walk(dt);
         break;
+      case "run":
+        this.run(dt);
+        break;
       case "jump":
         this.jump(dt);
+        break;
+      case "lay":
+        this.still(dt);
+        break;
+      case "stand":
+        this.still(dt);
+        break;
+      case "sit":
+        this.still(dt);
         break;
       default:
         break;
     }
   }
 
+  // walk, run, sit, lay... stand.
   // STATE HANDLERS
   walk(dt) {
     const config = stateConfig.walk;
@@ -151,6 +183,14 @@ export class Cats {
     this.velocity = {
       x: (config.speed * this.direction) / 0.8,
       y: !config.speed,
+    };
+  }
+  // works for sit, lay and stand.
+  still(dt) {
+    const config = stateConfig.stand;
+    this.velocity = {
+      x: config.speed * this.direction,
+      y: config.speed,
     };
   }
 
