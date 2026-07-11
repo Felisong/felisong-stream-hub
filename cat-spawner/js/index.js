@@ -47,7 +47,6 @@ eventSource.onmessage = (e) => {
   // depending on name provide one variable that new stat
   // const newState = currentEvent value I read.
 
-  // currentCat.state = newState; ?
 };
 
 eventSource.onerror = (e) => {

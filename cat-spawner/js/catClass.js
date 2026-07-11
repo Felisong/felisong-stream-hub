@@ -28,7 +28,7 @@ const stateConfig = {
   },
   jump: {
     id: 3,
-    speed: 4,
+    speed: 10,
     minDuration: 1,
     maxDuration: 1,
     hitbox: { h: 100, w: 100 },
@@ -71,6 +71,7 @@ export class Cats {
     this.opacity = cat.opacity;
     this.direction = cat.direction;
     this.velocity = cat.velocity;
+    this.isJumping = false;
     // state duration
     this.duration = cat.duration;
     this.targetDuration = cat.targetDuration;
@@ -78,6 +79,9 @@ export class Cats {
     this.container = null;
     this.body = null;
     this.nameLabel = null;
+    // world properties
+    this.groundY = 100;
+    this.wallX = 100;
   }
 
   spawnCat(windowHeight, windowWidth) {
@@ -113,10 +117,15 @@ export class Cats {
     this.targetDuration =
       Math.random() * (cfg.maxDuration - cfg.minDuration) + cfg.minDuration;
     console.log(`new state selected! :`, newState, "successfully triggered.");
+
+    if (newState === "jump") {
+      this.velocity.y = -cfg.speed; // one-time kick, no dt scaling
+      this.isJumping = true;
+    }
   }
 
   stateDuration(dt) {
-    if (this.state === "spawn") return;
+    if (this.state === "spawn" || this.state === "jump") return;
 
     this.duration += dt;
     if (this.duration > this.targetDuration) {
@@ -142,6 +151,9 @@ export class Cats {
         break;
       case "jump":
         this.jump(dt);
+        break;
+      case "fall":
+        this.fall(dt);
         break;
       case "lay":
         this.still(dt);
@@ -179,12 +191,20 @@ export class Cats {
 
   jump(dt) {
     const config = stateConfig.jump;
+    const gravity = 10;
 
-    this.velocity = {
-      x: (config.speed * this.direction) / 0.8,
-      y: !config.speed,
-    };
+    this.velocity.y += gravity * dt; // gravity always applies while airborne
+    this.velocity.x = config.speed * this.direction;
+
+    // landing behavior.
+    if (this.isJumping && this.velocity.y > 0 && this.yPos >= this.groundY) {
+      this.yPos = this.groundY;
+      this.velocity.y = 0;
+      this.isJumping = false;
+      this.enterState("walk");
+    }
   }
+
   // works for sit, lay and stand.
   still(dt) {
     const config = stateConfig.stand;
