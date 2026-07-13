@@ -28,7 +28,7 @@ const stateConfig = {
   },
   jump: {
     id: 3,
-    speed: 10,
+    speed: 20,
     minDuration: 1,
     maxDuration: 1,
     hitbox: { h: 100, w: 100 },
@@ -191,9 +191,7 @@ export class Cats {
 
   jump(dt) {
     const config = stateConfig.jump;
-    const gravity = 10;
-
-    this.velocity.y += gravity * dt; // gravity always applies while airborne
+    this.applyGravity(dt);
     this.velocity.x = config.speed * this.direction;
 
     // landing behavior.
@@ -214,12 +212,24 @@ export class Cats {
     };
   }
 
+  // helpers
+  applyGravity(dt) {
+    const gravity = 35;
+    this.velocity.y += gravity * dt;
+  }
+
+
+
+
+  // POSITION HANDLER
   newPosition(dt) {
     this.xPos += this.velocity.x * dt;
     this.yPos += this.velocity.y * dt;
   }
 
+  // CONSTRAINT HANDLER
   borderHandler() {
+    // when i no longer want this i can add a condition outside or inside idk yet.
     if (this.xPos > 95) {
       this.xPos = 95;
       this.direction = -1;
