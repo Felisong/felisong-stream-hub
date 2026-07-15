@@ -39,15 +39,14 @@ router.get("/cat-spawner/events", (req, res) => {
   });
 });
 
-router.get("/cat-spawner/create-event", (req,res) => {
+router.get("/create-event", (req, res) => {
   const body = req.body;
-
-
-  return {
-    success: true, 
-    message: "Successfully created event."
-  }
-})
+  console.log(`body: `, body);
+  res.json({
+    success: true,
+    message: "meow.",
+  });
+});
 
 // now on updates, update the data in each object coming in
 function broadcastToCatSpawner(event) {

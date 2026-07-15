@@ -1,5 +1,6 @@
 "use strict";
 import { Cats } from "./catClass.js";
+import { createNewReward } from "./fetches.js";
 const eventSource = new EventSource(
   "http://localhost:3000/projects/cat-spawner/events",
 );
@@ -9,13 +10,13 @@ let windowWidth = 0;
 let windowHeight = 0;
 let lastTime;
 let isSpecialState = false;
+let specialStatesInitialized = false;
 const rewardHandler = {
   "18a8e3f9-88a5-48ac-a859-36acab719944": (cat, event) => {
     // spawn cat always!
     if (!cat) {
       // y axis starts 5-100
       // x axis is 0-95
-
       // if this is a new cat.  Creates the cat!
       const cat = new Cats({
         name: currentEvent.user,
@@ -32,6 +33,12 @@ const rewardHandler = {
       });
       cat.spawnCat(windowHeight, windowWidth);
       activeCats.set(`${currentEvent.user}`, cat);
+
+      if (!specialStatesInitialized) {
+        // create all rewards.
+        createNewReward("Lick", 10);
+        specialStatesInitialized = true;
+      }
 
       return { refund: false };
     } else {
@@ -55,7 +62,6 @@ eventSource.onmessage = (e) => {
 
   if (result?.refund) {
     // call the redemption-status PATCH to cancel/refund
-    
   }
 };
 

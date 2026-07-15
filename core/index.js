@@ -34,7 +34,6 @@ app.get("/", (req, res) => {
 });
 // redirect to twitch login
 app.get("/auth", (req, res) => {
-
   const url = `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
   res.redirect(url);
 });
@@ -44,7 +43,6 @@ app.get("/auth/callback", async (req, res) => {
   const code = req.query.code;
 
   try {
-
     const response = await axios.post(
       "https://id.twitch.tv/oauth2/token",
       null,
@@ -71,8 +69,6 @@ app.get("/auth/callback", async (req, res) => {
     res.send("Something went wrong during retrieving data");
   }
 });
-
-
 
 // On start handler depending on the existence of the token.json
 startUp();
