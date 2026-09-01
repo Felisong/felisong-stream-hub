@@ -1,16 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const path = require("path");
+const { clients, broadcastToCatSpawner } = require("./sseClients");
+const catFetches = require("./catFetches");
+
 router.use(express.json());
-const clients = {
-  catSpawner: [],
-};
 
 // serves the front end html file for me at this endpoint
 router.use(
   "/cat-spawner",
   express.static(path.join(__dirname, "../../cat-spawner")),
 );
+
 // Cat spawner server sent events endpoint - front end will be calling here
 router.get("/cat-spawner/events", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
@@ -21,16 +22,12 @@ router.get("/cat-spawner/events", (req, res) => {
   res.write('data: {"connected": true}\n\n');
 
   clients.catSpawner.push(res);
-  console.log(
-    `Cat spawn client connectedion, total:${clients.catSpawner.length}`,
-  );
+  console.log(`Cat spawn client connected, total:${clients.catSpawner.length}`);
 
-  // keep connection alive
   const heartbeat = setInterval(() => {
     res.write(": ping\n\n");
   }, 15000);
 
-  // clear array on close.
   req.on("close", () => {
     clearInterval(heartbeat);
     console.log("Client disconnected!");
@@ -39,20 +36,7 @@ router.get("/cat-spawner/events", (req, res) => {
   });
 });
 
-router.post("/create-reward", (req, res) => {
-  const body = req.body; // already parsed, no JSON.parse needed
-  console.log(`GOT HERE!: `, body);
-  res.json({
-    success: true,
-    message: "meow.",
-  });
-});
-
-// now on updates, update the data in each object coming in
-function broadcastToCatSpawner(event) {
-  console.log(`broadcasting to ${clients.catSpawner.length} clients`);
-  const data = `data: ${JSON.stringify(event)}\n\n`;
-  clients.catSpawner.forEach((client) => client.write(data));
-}
+// all /cats/* routes live in catFetches.js
+router.use("/cats", catFetches);
 
 module.exports = { router, broadcastToCatSpawner };

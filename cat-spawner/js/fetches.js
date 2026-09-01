@@ -8,7 +8,7 @@ export async function createNewReward(title, cost, details) {
   if (details) body[details] = details;
   console.log(`got to fetches.js`, body);
 
-  const res = await fetch(baseUrl + "/projects/create-reward", {
+  const res = await fetch(baseUrl + "/projects/cats/create-reward", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
