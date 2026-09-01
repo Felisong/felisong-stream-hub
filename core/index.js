@@ -65,7 +65,7 @@ app.get("/auth/callback", async (req, res) => {
     console.log("Tokens saved!");
     res.send("Auth complete! You can close this tab.");
   } catch (err) {
-    // console.error(err);
+    console.error(err);
     res.send("Something went wrong during retrieving data");
   }
 });
@@ -77,4 +77,5 @@ startUp();
 app.listen(PORT, () => {
   console.log(`Stream hub is running on http://localhost:${PORT}`);
   console.log(`Authorize at http://localhost:${PORT}/auth`);
+  console.log(`Cats at http://localhost:${PORT}/projects/cat-spawner/`);
 });

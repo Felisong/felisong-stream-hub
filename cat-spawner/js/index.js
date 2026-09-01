@@ -12,6 +12,7 @@ let lastTime;
 const rewardHandlers = {
   "18a8e3f9-88a5-48ac-a859-36acab719944": (cat, event) => {
     // spawn cat always!
+    // example of how to call a function from here.
     return createNewReward("Meow!", 10, { name: "hello!" });
     // if (!cat) {
     //   // y axis starts 5-100
@@ -71,6 +72,7 @@ eventSource.onerror = (e) => {
   console.log(`error on event!: `, e);
 };
 
+// helper to limit behavior for future troubleshooting.
 let run = 0;
 // environmentLoop
 function gameLoop(timestamp) {

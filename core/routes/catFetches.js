@@ -9,13 +9,20 @@ router.post("/create-reward", (req, res) => {
   console.log(`GOT HERE!: `, body);
 
   // example: push the update out to any connected cat-spawner clients
-  // broadcastToCatSpawner({ type: "reward-created", ...body });
+  //    broadcastToCatSpawner({
+  //   reward: event.reward,
+  //   user: event.user_name,
+  //   input: event.user_input,
+  // whatever else. This will send the event to change behavior immediately.
+  // });
 
   res.json({
     success: true,
     message: "meow.",
   });
 });
+
+// TODO: make a refundReward function here.
 
 router.post("/create-cat", (req, res) => {
   const body = req.body;
