@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const path = require("path");
-
+router.use(express.json());
 const clients = {
   catSpawner: [],
 };
@@ -39,9 +39,9 @@ router.get("/cat-spawner/events", (req, res) => {
   });
 });
 
-router.get("/create-event", (req, res) => {
-  const body = req.body;
-  console.log(`body: `, body);
+router.post("/create-reward", (req, res) => {
+  const body = req.body; // already parsed, no JSON.parse needed
+  console.log(`GOT HERE!: `, body);
   res.json({
     success: true,
     message: "meow.",
