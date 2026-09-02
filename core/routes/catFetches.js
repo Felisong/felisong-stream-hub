@@ -22,7 +22,26 @@ router.post("/create-reward", (req, res) => {
   });
 });
 
-// TODO: make a refundReward function here.
+router.post("/refund-reward", async (req, res) => {
+  const rewardId = req.body;
+  console.log(`reward Id gets to the backend: `, rewardId);
+
+  // const response = await axios.post(
+  //   "https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions",
+  //   null,
+  //   {
+  //     params: {
+  //       broadcaster_id: process.env.TWITCH_BROADCASTER_ID,
+  //       id: rewardId,
+  //     },
+  //   },
+  // );
+  // finish error handling for this 
+  res.json({
+    success: true,
+    message: "meow.",
+  });
+});
 
 router.post("/create-cat", (req, res) => {
   const body = req.body;
