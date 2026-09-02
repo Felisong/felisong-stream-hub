@@ -16,7 +16,21 @@ export async function createNewReward(title, cost, details) {
   if (!res.ok) {
     console.error(res);
   }
-  const response = await res.json();
+
+  return await res.json();;
+}
+
+// create refundReward fetch here.
+export async function refundReward(rewardId) {
+  // details can be any information depending on reward.
+  const res = await fetch(baseUrl + "/projects/cats/refund-reward", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(rewardId),
+  });
+  if (!res.ok) {
+    console.error(res);
+  }
   console.log(`res: `, response);
-  return response;
+  return await res.json();
 }

@@ -85,6 +85,7 @@ export class Cats {
   }
 
   spawnCat(windowHeight, windowWidth) {
+    console.log('spawning the cat in catClass.js')
     const playArea = window.document.getElementById("cat-play-area");
     this.nameLabel = document.createElement("p");
     this.body = document.createElement("div");
@@ -121,6 +122,8 @@ export class Cats {
     if (newState === "jump") {
       this.velocity.y = -cfg.speed; // one-time kick, no dt scaling
       this.isJumping = true;
+    } else if (newState === "inputLeft"){
+
     }
   }
 
@@ -199,6 +202,11 @@ export class Cats {
       this.yPos = this.groundY;
       this.velocity.y = 0;
       this.isJumping = false;
+
+      // i will need to change the state... 
+      // if (this.state === 'leftInput' || this.state === 'rightInput'){
+      // I want to enter whatever the user is entering??? 
+      // } else {}
       this.enterState("walk");
     }
   }
@@ -218,6 +226,7 @@ export class Cats {
     this.velocity.y += gravity * dt;
   }
 
+  // TODO: zoomies, lick, feed... how will I do melee mode? I guess.. left, right, jump, down?
 
 
 

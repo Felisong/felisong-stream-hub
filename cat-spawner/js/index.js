@@ -10,41 +10,49 @@ let windowHeight = 0;
 let lastTime;
 
 const rewardHandlers = {
-  "18a8e3f9-88a5-48ac-a859-36acab719944": (cat, event) => {
-    // spawn cat always!
-    // example of how to call a function from here.
-    return createNewReward("Meow!", 10, { name: "hello!" });
-    // if (!cat) {
-    //   // y axis starts 5-100
-    //   // x axis is 0-95
-    //   // if this is a new cat.  Creates the cat!
-    //   const cat = new Cats({
-    //     name: currentEvent.user,
-    //     color: currentEvent.input || "white",
-    //     xPos: 0,
-    //     yPos: 100,
-    //     scale: 1,
-    //     state: "spawn",
-    //     opacity: 100,
-    //     direction: 1,
-    //     velocity: { x: 0, y: 0 },
-    //     duration: 0,
-    //     targetDuration: 0,
-    // latestReward = {event};
-    //   });
-    //   cat.spawnCat(windowHeight, windowWidth);
-    //   activeCats.set(`${currentEvent.user}`, cat);
+  "18a8e3f9-88a5-48ac-a859-36acab719944": (cat, currentEvent) => {
+    // if both are true, a cat already exists.
+    if (cat, currentEvent)
+      return { message: "Cat already exists! Points refunded.", refund: true };
 
-    //   if (!specialStatesInitialized) {
-    //     // create all rewards.
-    //     createNewReward("Lick", 10);
-    //     specialStatesInitialized = true;
-    //   }
+    // y axis starts 5-100
+    // x axis is 0-95
+    // if this is a new cat.  Creates the cat!
+    const cat = new Cats({
+      name: currentEvent.user,
+      color: currentEvent.input || "white",
+      xPos: 0,
+      yPos: 100,
+      scale: 1,
+      state: "spawn",
+      opacity: 100,
+      direction: 1,
+      velocity: { x: 0, y: 0 },
+      duration: 0,
+      targetDuration: 0,
+      latestReward: currentEvent,
+    });
+    cat.spawnCat(windowHeight, windowWidth);
+    activeCats.set(`${currentEvent.user}`, cat);
 
-    //   return { refund: false };
-    // } else {
-    //   return { message: "Cat already exists! Points refunded.", refund: true };
-    // }
+    // all special state rewards.
+    createNewReward("Lick", 10); //  lick chat,
+    // zoomies
+    // feed
+    // ? i dont remember
+    // melee mode
+
+    return { refund: false };
+  },
+  "special-state-1": (cat, event) => {
+    if (!cat)
+      return {
+        message:
+          "Your cat doesn't exist yet! Please use 'Spawn Cat' reward first. Points refunded.",
+        refund: true,
+      };
+
+    //change cats state manually?
   },
 };
 // i can make an array of colors it default can have and math.random one from it
@@ -61,10 +69,11 @@ eventSource.onmessage = async (e) => {
 
   const currentCat = activeCats.get(currentEvent.user);
   // trigger function on specific cat
-  const result = await handler(currentEvent, currentCat);
+  const result = await handler(currentCat, currentEvent);
   console.log(`handler: `, result);
   if (result?.refund) {
     // call the redemption-status PATCH to cancel/refund
+    // refundReward(currentEvent)
   }
 };
 
