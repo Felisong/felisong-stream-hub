@@ -10,7 +10,7 @@ let windowHeight = 0;
 let lastTime;
 
 const rewardHandlers = {
-  "f4405acb-2e84-448e-8d4b-d9ace5ff55a6": (cat, currentEvent) => {
+  "3ce9eb2f-5099-4ac8-b724-5015c6172232": (cat, currentEvent) => {
     // if both are true, a cat already exists.
     if (cat)
       return { message: "Cat already exists! Points refunded.", refund: true };
@@ -72,6 +72,10 @@ eventSource.onmessage = async (e) => {
   const result = await handler(currentCat, currentEvent);
   if (result?.refund) {
     const res = await refundReward(currentEvent);
+    console.log(`refund successful? : `, res);
+    if (!res.success) {
+      console.error("failed to refund a reward.");
+    }
     // can i make twitch send a chat message here?
   }
 };

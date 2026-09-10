@@ -35,6 +35,5 @@ export async function refundReward(currentEvent) {
   if (!res.ok) {
     console.error('error: ',res);
   }
-  console.log(`after the fetch: `, res);
   return await res.json();
 }

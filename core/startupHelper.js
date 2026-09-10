@@ -151,9 +151,8 @@ async function initializeCatReward(accessToken) {
       break;
     }
   }
-  console.log(`rewards: `, rewards.data.data);
+
   if (!foundReward) {
-    console.log(`before the fetch!: `, foundReward);
     // if there is no customizable rewards, make it!
     const newReward = await axios.post(
       `https://api.twitch.tv/helix/channel_points/custom_rewards`,
@@ -163,8 +162,8 @@ async function initializeCatReward(accessToken) {
         prompt: "Type in what color you would like to be.",
         background_color: "#FF861F",
         is_user_input_required: true,
-        is_max_per_user_per_stream_enabled: true,
-        max_per_user_per_stream: 1,
+        // is_max_per_user_per_stream_enabled: true,
+        // max_per_user_per_stream: 1,
       },
       {
         params: {
@@ -177,6 +176,7 @@ async function initializeCatReward(accessToken) {
       },
     );
     // i can manually find the id using newReward.data
+    console.log(`new reward`, await newReward.data);
   }
 }
 async function startUp() {
