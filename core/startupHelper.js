@@ -38,7 +38,7 @@ async function refreshAccessToken() {
 
     // read the new tokens, and write in the file to update!
     const newTokens = response.data;
-    newTokens.expires_at = Date.now() + tokens.expires_in * 1000;
+    newTokens.expires_at = Date.now() + newTokens.expires_in * 1000;
     fs.writeFileSync(
       path.join(__dirname, "tokens.json"),
       JSON.stringify(newTokens, null, 2),
@@ -85,7 +85,7 @@ function connectToMyEventSub() {
           reward: event.reward,
           user: event.user_name,
           input: event.user_input,
-          redemptionId: event.id
+          redemptionId: event.id,
         });
       }
     });
@@ -125,6 +125,60 @@ function connectToMyEventSub() {
   getEvents();
 }
 
+async function initializeCatReward(accessToken) {
+  const broadcasterId = process.env.TWITCH_BROADCASTER_ID;
+  // first we check the rewards
+  const rewards = await axios.get(
+    "https://api.twitch.tv/helix/channel_points/custom_rewards",
+    {
+      params: {
+        broadcaster_id: broadcasterId,
+        only_manageable_rewards: true,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Client-Id": process.env.TWITCH_CLIENT_ID,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  let foundReward = false;
+
+  for (const reward of rewards.data.data) {
+    if (reward.title === "Spawn Cat") {
+      foundReward = true;
+      break;
+    }
+  }
+  console.log(`rewards: `, rewards.data.data);
+  if (!foundReward) {
+    console.log(`before the fetch!: `, foundReward);
+    // if there is no customizable rewards, make it!
+    const newReward = await axios.post(
+      `https://api.twitch.tv/helix/channel_points/custom_rewards`,
+      {
+        title: "Spawn Cat",
+        cost: 1,
+        prompt: "Type in what color you would like to be.",
+        background_color: "#FF861F",
+        is_user_input_required: true,
+        is_max_per_user_per_stream_enabled: true,
+        max_per_user_per_stream: 1,
+      },
+      {
+        params: {
+          broadcaster_id: process.env.TWITCH_BROADCASTER_ID,
+        },
+        headers: {
+          "Client-Id": process.env.TWITCH_CLIENT_ID,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    // i can manually find the id using newReward.data
+  }
+}
 async function startUp() {
   // if the file exists =>
   if (fs.existsSync(path.join(__dirname, "tokens.json"))) {
@@ -151,6 +205,8 @@ async function startUp() {
 
       await refreshAccessToken();
     }
+
+    initializeCatReward(tokens.access_token);
 
     connectToMyEventSub();
     setInterval(refreshAccessToken, 1000 * 60 * 60);

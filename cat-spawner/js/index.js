@@ -10,7 +10,7 @@ let windowHeight = 0;
 let lastTime;
 
 const rewardHandlers = {
-  "18a8e3f9-88a5-48ac-a859-36acab719944": (cat, currentEvent) => {
+  "f4405acb-2e84-448e-8d4b-d9ace5ff55a6": (cat, currentEvent) => {
     // if both are true, a cat already exists.
     if (cat)
       return { message: "Cat already exists! Points refunded.", refund: true };

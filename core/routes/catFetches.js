@@ -45,6 +45,7 @@ router.post("/refund-reward", async (req, res) => {
         },
       },
     );
+    // TODO: So this is reaching twitch, but bc i made my reward on the dashboard I cant refund it here -_- I have to make the reward on load.
     console.log(`failed response: `, response);
     if (response.status !== 200) {
       throw new Error("refund reward response not ok: " + response);

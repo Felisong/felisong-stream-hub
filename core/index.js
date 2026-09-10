@@ -70,11 +70,14 @@ app.get("/auth/callback", async (req, res) => {
 });
 
 // On start handler depending on the existence of the token.json
-startUp();
+async function main() {
+  await startUp();
 
-// listener
-app.listen(PORT, () => {
-  console.log(`Stream hub is running on http://localhost:${PORT}`);
-  console.log(`Authorize at http://localhost:${PORT}/auth`);
-  console.log(`Cats at http://localhost:${PORT}/projects/cat-spawner/`);
-});
+  app.listen(PORT, () => {
+    console.log(`Stream hub is running on http://localhost:${PORT}`);
+    console.log(`Authorize at http://localhost:${PORT}/auth`);
+    console.log(`Cats at http://localhost:${PORT}/projects/cat-spawner/`);
+  });
+}
+
+main();
