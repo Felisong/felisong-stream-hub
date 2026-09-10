@@ -1,6 +1,6 @@
 "use strict";
 import { Cats } from "./catClass.js";
-import { createNewReward } from "./fetches.js";
+import { createNewReward, refundReward } from "./fetches.js";
 const eventSource = new EventSource(
   "http://localhost:3000/projects/cat-spawner/events",
 );
@@ -12,13 +12,13 @@ let lastTime;
 const rewardHandlers = {
   "18a8e3f9-88a5-48ac-a859-36acab719944": (cat, currentEvent) => {
     // if both are true, a cat already exists.
-    if (cat, currentEvent)
+    if (cat)
       return { message: "Cat already exists! Points refunded.", refund: true };
 
     // y axis starts 5-100
     // x axis is 0-95
     // if this is a new cat.  Creates the cat!
-    const cat = new Cats({
+    const currentCat = new Cats({
       name: currentEvent.user,
       color: currentEvent.input || "white",
       xPos: 0,
@@ -32,11 +32,11 @@ const rewardHandlers = {
       targetDuration: 0,
       latestReward: currentEvent,
     });
-    cat.spawnCat(windowHeight, windowWidth);
-    activeCats.set(`${currentEvent.user}`, cat);
+    currentCat.spawnCat(windowHeight, windowWidth);
+    activeCats.set(`${currentEvent.user}`, currentCat);
 
     // all special state rewards.
-    createNewReward("Lick", 10); //  lick chat,
+    // createNewReward("Lick", 10); //  lick chat,
     // zoomies
     // feed
     // ? i dont remember
@@ -70,10 +70,9 @@ eventSource.onmessage = async (e) => {
   const currentCat = activeCats.get(currentEvent.user);
   // trigger function on specific cat
   const result = await handler(currentCat, currentEvent);
-  console.log(`handler: `, result);
   if (result?.refund) {
-    // call the redemption-status PATCH to cancel/refund
-    // refundReward(currentEvent)
+    const res = await refundReward(currentEvent);
+    // can i make twitch send a chat message here?
   }
 };
 

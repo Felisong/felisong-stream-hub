@@ -78,13 +78,14 @@ function connectToMyEventSub() {
 
       if (type === "notification") {
         const event = msg.payload.event;
-        const rewardTitle = msg.payload.subscription.type;
+        // const rewardTitle = msg.payload.subscription.type;
         // console.log("Event received:", rewardTitle, event);
 
         broadcastToCatSpawner({
           reward: event.reward,
           user: event.user_name,
           input: event.user_input,
+          redemptionId: event.id
         });
       }
     });

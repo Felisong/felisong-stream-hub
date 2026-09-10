@@ -21,16 +21,20 @@ export async function createNewReward(title, cost, details) {
 }
 
 // create refundReward fetch here.
-export async function refundReward(rewardId) {
+export async function refundReward(currentEvent) {
+  console.log(`current reward: `, currentEvent)
+  const rewardId = currentEvent.reward.id;
+  const redemptionId = currentEvent.redemptionId;
+  console.log(`before the fetch`)
   // details can be any information depending on reward.
   const res = await fetch(baseUrl + "/projects/cats/refund-reward", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(rewardId),
+    body: JSON.stringify({rewardId, redemptionId}),
   });
   if (!res.ok) {
-    console.error(res);
+    console.error('error: ',res);
   }
-  console.log(`res: `, response);
+  console.log(`after the fetch: `, res);
   return await res.json();
 }

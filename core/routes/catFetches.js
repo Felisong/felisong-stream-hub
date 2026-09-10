@@ -1,6 +1,8 @@
 const express = require("express");
+const axios = require("axios");
 const router = express.Router();
 const { broadcastToCatSpawner } = require("./sseClients");
+const getCurrentAccessToken = require("./getAccessToken");
 
 router.use(express.json());
 
@@ -23,24 +25,46 @@ router.post("/create-reward", (req, res) => {
 });
 
 router.post("/refund-reward", async (req, res) => {
-  const rewardId = req.body;
-  console.log(`reward Id gets to the backend: `, rewardId);
+  const body = req.body;
+  const accessToken = await getCurrentAccessToken();
+  try {
+    const response = await axios.patch(
+      `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions`,
+      {
+        status: "CANCELED",
+      },
+      {
+        params: {
+          broadcaster_id: process.env.TWITCH_BROADCASTER_ID,
+          reward_id: body.rewardId,
+          id: body.redemptionId,
+        },
+        headers: {
+          "Client-Id": process.env.TWITCH_CLIENT_ID,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    console.log(`failed response: `, response);
+    if (response.status !== 200) {
+      throw new Error("refund reward response not ok: " + response);
+    }
+    console.log(`fetch shouldve been successful?`);
+    // finish error handling for this
+    res.status(200).json({
+      success: true,
+      message: "Reward has been refunded.",
+    });
+  } catch (err) {
+    console.log("Twitch refund failed");
 
-  // const response = await axios.post(
-  //   "https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions",
-  //   null,
-  //   {
-  //     params: {
-  //       broadcaster_id: process.env.TWITCH_BROADCASTER_ID,
-  //       id: rewardId,
-  //     },
-  //   },
-  // );
-  // finish error handling for this 
-  res.json({
-    success: true,
-    message: "meow.",
-  });
+    console.log("status:", err);
+
+    res.status(err.response?.status || 500).json({
+      success: false,
+      message: err.response?.data?.message || "Failed to refund reward.",
+    });
+  }
 });
 
 router.post("/create-cat", (req, res) => {

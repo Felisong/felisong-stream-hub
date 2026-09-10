@@ -41,7 +41,6 @@ app.get("/auth", (req, res) => {
 // twitch sends us back here with a code
 app.get("/auth/callback", async (req, res) => {
   const code = req.query.code;
-
   try {
     const response = await axios.post(
       "https://id.twitch.tv/oauth2/token",
