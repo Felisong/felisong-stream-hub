@@ -9,6 +9,8 @@ let windowWidth = 0;
 let windowHeight = 0;
 let lastTime;
 
+//TODO: make extra reward and figure out their behavior
+// figure out how to send a message in chat.
 const rewardHandlers = {
   "3ce9eb2f-5099-4ac8-b724-5015c6172232": (cat, currentEvent) => {
     // if both are true, a cat already exists.

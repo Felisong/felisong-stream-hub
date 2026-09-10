@@ -18,6 +18,7 @@ const SCOPES = [
   "moderator:read:followers",
   "bits:read",
   "channel:manage:raids",
+  "user:write:chat",
 ].join(" ");
 
 app.use("/projects", router);
