@@ -1,6 +1,6 @@
 "use strict";
 import { Cats } from "./catClass.js";
-import { createNewReward, refundReward } from "./fetches.js";
+import { createNewReward, refundReward, sendChatMessage } from "./fetches.js";
 const eventSource = new EventSource(
   "http://localhost:3000/projects/cat-spawner/events",
 );
@@ -10,7 +10,6 @@ let windowHeight = 0;
 let lastTime;
 
 //TODO: make extra reward and figure out their behavior
-// figure out how to send a message in chat.
 const rewardHandlers = {
   "3ce9eb2f-5099-4ac8-b724-5015c6172232": (cat, currentEvent) => {
     // if both are true, a cat already exists.
@@ -79,6 +78,7 @@ eventSource.onmessage = async (e) => {
       console.error("failed to refund a reward.");
     }
     // can i make twitch send a chat message here?
+    sendChatMessage(currentEvent.reward.title + " has been refunded to " + currentEvent.user);
   }
 };
 

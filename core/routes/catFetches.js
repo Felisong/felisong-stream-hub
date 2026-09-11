@@ -65,6 +65,51 @@ router.post("/refund-reward", async (req, res) => {
   }
 });
 
+router.post("/send-chat-message", async (req, res) => {
+  const chatMessage = req.body.message;
+  console.log(`message: `, chatMessage);
+  const accessToken = await getCurrentAccessToken();
+  console.log(`access token is not missing?: `, accessToken);
+  try {
+    let response = await axios.post(
+      "https://api.twitch.tv/helix/chat/messages",
+
+      {
+        broadcaster_id: process.env.TWITCH_BROADCASTER_ID,
+        sender_id: process.env.TWITCH_BROADCASTER_ID,
+        message: chatMessage,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Client-Id": process.env.TWITCH_CLIENT_ID,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    const data = response.data;
+    if (response.status != 200) {
+      throw new Error(
+        `failed in sending a chat message backend: `,
+        data.status,
+      );
+    }
+    res.status(200).json({
+      success: true,
+      message: "message should have sent: " + data.message,
+    });
+  } catch (err) {
+    console.log("Twitch send message failed");
+
+    console.log("status:", err);
+
+    res.status(err.response?.status || 500).json({
+      success: false,
+      message: err.response?.data?.message || "Failed to send message.",
+    });
+  }
+});
+
 router.post("/create-cat", (req, res) => {
   const body = req.body;
   console.log(`create-cat: `, body);

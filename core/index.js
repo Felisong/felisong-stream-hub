@@ -19,6 +19,8 @@ const SCOPES = [
   "bits:read",
   "channel:manage:raids",
   "user:write:chat",
+  "user:bot",
+  "user:read:chat"
 ].join(" ");
 
 app.use("/projects", router);
@@ -35,7 +37,7 @@ app.get("/", (req, res) => {
 });
 // redirect to twitch login
 app.get("/auth", (req, res) => {
-  const url = `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
+  const url = `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${SCOPES}&force_verify=true`;
   res.redirect(url);
 });
 
