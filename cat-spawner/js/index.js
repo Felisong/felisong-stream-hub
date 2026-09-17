@@ -35,16 +35,16 @@ const rewardHandlers = {
     });
     currentCat.spawnCat(windowHeight, windowWidth);
     activeCats.set(`${currentEvent.user}`, currentCat);
-
-    // all special state rewards.
+    // create all cat rewards here. 
+    return { refund: false };
+  },
+   // all special state rewards.
     // createNewReward("Lick", 10); //  lick chat,
     // zoomies
     // feed
     // ? i dont remember
     // melee mode
 
-    return { refund: false };
-  },
   "special-state-1": (cat, event) => {
     if (!cat)
       return {

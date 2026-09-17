@@ -4,6 +4,7 @@ export async function createNewReward(title, cost, details) {
     title: title,
     cost: cost,
   };
+  console.log(`before the fetch`);
   // details can be any information depending on reward.
   if (details) body[details] = details;
   console.log(`got to fetches.js`, body);
@@ -25,7 +26,7 @@ export async function refundReward(currentEvent) {
   console.log(`current reward: `, currentEvent);
   const rewardId = currentEvent.reward.id;
   const redemptionId = currentEvent.redemptionId;
-  console.log(`before the fetch`);
+
   // details can be any information depending on reward.
   const res = await fetch(baseUrl + "/projects/cats/refund-reward", {
     method: "POST",

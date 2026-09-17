@@ -6,22 +6,37 @@ const getCurrentAccessToken = require("./getAccessToken");
 
 router.use(express.json());
 
-router.post("/create-reward", (req, res) => {
+router.post("/create-reward", async (req, res) => {
   const body = req.body;
   console.log(`GOT HERE!: `, body);
 
-  // example: push the update out to any connected cat-spawner clients
-  //    broadcastToCatSpawner({
-  //   reward: event.reward,
-  //   user: event.user_name,
-  //   input: event.user_input,
-  // whatever else. This will send the event to change behavior immediately.
-  // });
+  //  let response = await axios.post(
+  //     "https://api.twitch.tv/helix/channel_points/custom_rewards",
 
-  res.json({
-    success: true,
-    message: "meow.",
-  });
+  //     {
+  //       broadcaster_id: process.env.TWITCH_BROADCASTER_ID,
+  //       message: chatMessage,
+  //     },
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //         "Client-Id": process.env.TWITCH_CLIENT_ID,
+  //         "Content-Type": "application/json",
+  //       },
+  //     },
+  //   );
+  //   const data = response.data;
+  //   if (response.status != 200) {
+  //     throw new Error(
+  //       `failed in sending a chat message backend: `,
+  //       data.status,
+  //     );
+  //   }
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "message should have sent: " + data.message,
+  //   });
+
 });
 
 router.post("/refund-reward", async (req, res) => {
